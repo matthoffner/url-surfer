@@ -20,12 +20,15 @@ const model = new HuggingFaceTransformersEmbeddings({
     modelName: "Xenova/all-MiniLM-L6-v2",
 });
 
+const urlRegex = /(https?:\/\/[^\s]+)/g;
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const targetUrl = req.query.url as string;
   const prompt = req.query.prompt as string;
+  const urls = prompt.match(urlRegex);
+  const targetUrl = urls ? urls[0] : null
 
   if (!targetUrl) {
-    return res.status(400).json({ error: 'No URL provided' });
+    return `Couldn't find url, here is the ${prompt}`;
   }
 
   try {
