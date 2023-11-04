@@ -6,7 +6,7 @@ import pdfParse from 'pdf-parse';
 import puppeteer from 'puppeteer';
 import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
 import { MemoryVectorStore } from 'langchain/vectorstores/memory';
-import { XenovaTransformersEmbeddings } from '../../embed/hf';
+import { HuggingFaceTransformersEmbeddings } from "langchain/embeddings/hf_transformers";
 
 const DEFAULT_CHUNK_SIZE = 1000;
 const textSplitter = new RecursiveCharacterTextSplitter({ chunkSize: DEFAULT_CHUNK_SIZE });
@@ -15,6 +15,10 @@ async function extractTextFromPDF(buffer: Buffer): Promise<string> {
   const data = await pdfParse(buffer);
   return data.text;
 }
+
+const model = new HuggingFaceTransformersEmbeddings({
+    modelName: "Xenova/all-MiniLM-L6-v2",
+});
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const targetUrl = req.query.url as string;
@@ -61,7 +65,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       [...documents.map(doc => doc.pageContent)],
       // @ts-ignore
       [...documents.map((v, k) => k)],
-      new XenovaTransformersEmbeddings()
+      model
     )
     const queryResult = await vectorStore.similaritySearch(prompt, 2);
     return res.status(200).send(
