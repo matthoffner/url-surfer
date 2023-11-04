@@ -9,6 +9,7 @@ import { MemoryVectorStore } from 'langchain/vectorstores/memory';
 import { XenovaTransformersEmbeddings } from '../../embed/hf';
 
 const DEFAULT_CHUNK_SIZE = 1000;
+const textSplitter = new RecursiveCharacterTextSplitter({ chunkSize: DEFAULT_CHUNK_SIZE });
 
 async function extractTextFromPDF(buffer: Buffer): Promise<string> {
   const data = await pdfParse(buffer);
@@ -47,32 +48,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       content = await response.text();
     }
 
-    const textSplitter = new RecursiveCharacterTextSplitter({ chunkSize: DEFAULT_CHUNK_SIZE });
+    if (!content) {
+      return `Couldn't find ${targetUrl}, here is the ${prompt}`;
+    }
+    
     const documents = await textSplitter.createDocuments([content]);
 
-    // Using the provided MemoryVectorStore initialization
     const vectorStore = await MemoryVectorStore.fromTexts(
       // @ts-ignore
-      documents.map((doc: { text }) => doc.text),
-      documents.map((_: any, index: { toString: () => any; }) => index.toString()),
-      new XenovaTransformersEmbeddings()
-    );
-
-    if (prompt) {
-      // Perform similarity search based on user input
-      const queryResult = await vectorStore.similaritySearch(prompt, 2);
-
-  // @ts-ignore
-      const results = queryResult.map(({ id, score }): string => {
-        // @ts-ignore
-        return `Result ${id} with score ${score}: ${documents[parseInt(id)].text}`;
-      }).join('\n\n');
-
-      return res.status(200).send(results);
-    } else {
+      [...documents.map(doc => doc.pageContent)],
       // @ts-ignore
-      return res.status(200).send(`Summary: ${documents[0].text}`);
-    }
+      [...documents.map((v, k) => k)],
+      new XenovaTransformersEmbeddings()
+    )
+    const queryResult = await vectorStore.similaritySearch(prompt, 2);
+    return res.status(200).send(
+      `Here is the context: ${JSON.stringify(queryResult.map(result => result.pageContent))} from using the prompt to lookup relevant information. Here is the prompt: ${prompt}`);
   } catch (error) {
     console.error(error);
     // @ts-ignore
