@@ -35,6 +35,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     } else if (contentType.includes('text/html')) {
       const html = await response.text();
       const dom = new JSDOM(html);
+      const scripts = dom.window.document.querySelectorAll('script, style');
+      scripts.forEach(element => element.remove());
       content = dom.window.document.body.textContent || '';
 
       if (!content.trim()) {
