@@ -1,9 +1,6 @@
 import { Configuration, OpenAIApi } from "openai-edge";
 import { OpenAIStream, StreamingTextResponse } from "ai";
-
-import {
-  createRequest,
-} from "openai-function-calling-tools";
+import { createRequest } from "@/pages/api/surfer";
 
 const [, requestSchema] = createRequest();
 
@@ -11,8 +8,6 @@ const config = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
 });
 const openai = new OpenAIApi(config);
-
-export const runtime = "edge";
 
 const functions: any[] = [
   requestSchema

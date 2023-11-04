@@ -1,6 +1,5 @@
 "use client";
 
-import React, { useState } from 'react';
 import styles from './page.module.css';
 import { useChat } from 'ai/react';
 import { Message } from 'ai';
@@ -10,9 +9,7 @@ import { toast } from 'sonner';
 import { Collapse } from './collapse';
 import { FunctionIcon } from './icons';
 
-const URLSurferComponent: React.FC = () => {
-  const [prompt, setPrompt] = useState('');
-
+const Page: React.FC = () => {
   const { messages, input, setInput, handleSubmit, isLoading } = useChat({
     onResponse: (response: { status: number; }) => {
       if (response.status === 429) {
@@ -140,4 +137,4 @@ const URLSurferComponent: React.FC = () => {
   );
 };
 
-export default URLSurferComponent;
+export default Page;
