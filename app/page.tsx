@@ -29,7 +29,7 @@ export default function Home() {
   return (
     <main className={styles.main}>
       <h1 className={styles.title}>
-        Chat with your data
+        🔗 URL Surfer 🏄‍♂️
       </h1>
 
       <form onSubmit={handleSubmit} className={styles.form}>

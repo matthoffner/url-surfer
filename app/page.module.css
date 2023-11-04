@@ -227,3 +227,65 @@
     transform: rotate(0deg);
   }
 }
+
+.response pre {
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  overflow-y: auto;
+  max-height: 500px; /* Maximum height before scrolling */
+}
+
+.input {
+  padding: 0.5rem 1rem; /* Adjust the padding inside the input */
+  margin: 0.5rem 0; /* Adds margin around the input for spacing */
+  border: 1px solid #ccc; /* A light border for the input */
+  border-radius: 4px; /* Rounded corners */
+  font-size: 1rem; /* Base font size */
+  line-height: 1.5; /* Height of the input line */
+  color: #333; /* Text color */
+  background-color: #fff; /* Background color of the input */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: Adds a subtle shadow */
+  width: 100%; /* Make input full width of the parent container */
+  box-sizing: border-box; /* Include padding and border in the element's total width and height */
+  transition: border-color 0.3s, box-shadow 0.3s; /* Smooth transition for focus effect */
+}
+
+.input:focus {
+  border-color: #007bff; /* Highlight color when input is focused */
+  outline: none; /* Removes the default focus outline */
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25); /* Adds a glow effect on focus */
+}
+
+.button {
+  padding: 0.75rem 1.5rem; /* Adjust padding to increase the button's size */
+  margin-top: 1rem; /* Space above the button */
+  border: none; /* No border for a button */
+  border-radius: 25px; /* Rounded corners for a pill shape */
+  font-size: 1rem; /* Font size */
+  font-weight: bold; /* Make the text a bit bolder */
+  color: white; /* Text color */
+  background-image: linear-gradient(to right, #6ee7b7, #3b82f6); /* Gradient background */
+  cursor: pointer; /* Change cursor to indicate it's clickable */
+  transition: transform 0.2s, background-color 0.3s; /* Smooth transitions for interactions */
+  text-transform: uppercase; /* Optional: uppercase text */
+  letter-spacing: 0.05em; /* Spacing between letters */
+  box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08); /* Subtle shadow for depth */
+}
+
+.button:hover, .button:focus {
+  background-image: linear-gradient(to left, #6ee7b7, #3b82f6); /* Change the direction of gradient on hover/focus */
+  transform: translateY(-2px); /* Slightly raise the button */
+  box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08); /* Increase shadow size */
+}
+
+.button:active {
+  transform: translateY(0); /* Button goes back down when clicked */
+  box-shadow: 0 3px 6px rgba(50, 50, 93, 0.16), 0 2px 4px rgba(0, 0, 0, 0.1); /* Smaller shadow when button is pressed */
+}
+
+.button:disabled {
+  background-image: linear-gradient(to right, #cbd5e1, #94a3b8); /* Less vibrant gradient for disabled state */
+  cursor: default; /* No pointer cursor since it's not clickable */
+  box-shadow: none; /* No shadow for a flat appearance */
+}
