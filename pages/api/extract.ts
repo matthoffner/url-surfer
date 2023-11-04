@@ -9,6 +9,7 @@ import { MemoryVectorStore } from 'langchain/vectorstores/memory';
 import { HuggingFaceTransformersEmbeddings } from "langchain/embeddings/hf_transformers";
 
 const DEFAULT_CHUNK_SIZE = 1000;
+const VECTOR_STORE_SIZE = 5;
 const textSplitter = new RecursiveCharacterTextSplitter({ chunkSize: DEFAULT_CHUNK_SIZE });
 
 async function extractTextFromPDF(buffer: Buffer): Promise<string> {
@@ -70,7 +71,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       [...documents.map((v, k) => k)],
       model
     )
-    const queryResult = await vectorStore.similaritySearch(prompt, 2);
+    const queryResult = await vectorStore.similaritySearch(prompt, VECTOR_STORE_SIZE);
     return res.status(200).send(
       `Here is the context: ${JSON.stringify(queryResult.map(result => result.pageContent))} from using the prompt to lookup relevant information. Here is the prompt: ${prompt}`);
   } catch (error) {

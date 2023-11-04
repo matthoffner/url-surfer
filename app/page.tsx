@@ -46,7 +46,7 @@ export default function Home() {
 
       {response && (
         <div className={styles.response}>
-          <h3>Response:</h3>
+          <h4>Response:</h4>
           <pre>{response}</pre>
         </div>
       )}
