@@ -1,10 +1,10 @@
+
+
 .main {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  align-items: center;
   padding: 6rem;
-  min-height: 100vh;
 }
 
 .description {
@@ -288,4 +288,100 @@
   background-image: linear-gradient(to right, #cbd5e1, #94a3b8); /* Less vibrant gradient for disabled state */
   cursor: default; /* No pointer cursor since it's not clickable */
   box-shadow: none; /* No shadow for a flat appearance */
+}
+.main {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+}
+
+.title {
+  color: #333;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.messages {
+  flex: 1;
+  min-height: 80vh;
+}
+
+/* Chat message styles */
+.message {
+  background-color: #f9f9f9;
+  border-radius: 15px;
+  padding: 10px 15px;
+  margin: 8px 0;
+  max-width: 80%;
+  word-break: break-word; /* Ensures text breaks nicely */
+}
+
+/* Different background for messages from the 'user' role */
+.message-user {
+  background-color: #dcf8c6 !important;
+}
+
+/* Avatar styles */
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #ccc;
+  margin-right: 10px;
+}
+
+/* Style for function call messages */
+.function-call {
+  color: #555;
+  font-style: italic;
+}
+
+/* Input field styles */
+.input {
+  padding: 10px;
+  margin: 10px 0;
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+/* Button styles */
+.button {
+  padding: 10px 20px;
+  background-color: #5cb85c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.button:disabled {
+  background-color: #ccc;
+}
+
+/* Form styles */
+.form {
+  width: 100%;
+  max-width: 500px;
+}
+
+.flex {
+  display: flex;
+  align-items: flex-start;
+}
+
+.text-gray-500 {
+  color: #737373;
+}
+
+.font-bold {
+  font-weight: bold;
+}
+
+/* Additional media query for responsive design */
+@media (max-width: 640px) {
+  .message {
+    max-width: 100%;
+  }
 }

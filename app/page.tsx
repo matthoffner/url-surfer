@@ -1,41 +1,134 @@
 "use client";
 
-import { useState } from 'react';
-import styles from './page.module.css'
+import React, { useState } from 'react';
+import styles from './page.module.css';
+import { useChat } from 'ai/react';
+import { Message } from 'ai';
+import ReactMarkdown from "react-markdown";
+import { Bot, User } from "lucide-react";
+import { toast } from 'sonner';
+import { Collapse } from './collapse';
+import { FunctionIcon } from './icons';
 
-export default function Home() {
+const URLSurferComponent: React.FC = () => {
   const [prompt, setPrompt] = useState('');
-  const [response, setResponse] = useState('');
-  const [isLoading, setLoading] = useState(false);
 
-  const handleSubmit = async (event: { preventDefault: () => void; }) => {
-    event.preventDefault();
-    setLoading(true);
+  const { messages, input, setInput, handleSubmit, isLoading } = useChat({
+    onResponse: (response: { status: number; }) => {
+      if (response.status === 429) {
+        toast.error("You have reached your request limit for the day.");
+        return;
+      } else {
+        console.log("chat initialized");
+      }
+    },
+    onError: (error: any) => {
+      console.log(error);
+    },
+  });
 
-    try {
-      const res = await fetch(`/api/extract?prompt=${encodeURIComponent(prompt)}`);
-      if (!res.ok) throw new Error(`Error: ${res.status}`);
-      const text = await res.text();
-      setResponse(text);
-    } catch (error) {
-      console.error("Error fetching data: ", error);
-      setResponse('Failed to fetch data.');
-    } finally {
-      setLoading(false);
-    }
+  const roleUIConfig: {
+    [key: string]: {
+      avatar: JSX.Element;
+      bgColor: string;
+      avatarColor: string;
+      // eslint-disable-next-line no-unused-vars
+      dialogComponent: (message: Message) => JSX.Element;
+    };
+  } = {
+    user: {
+      avatar: <User width={20} />,
+      bgColor: "bg-white",
+      avatarColor: "bg-black",
+      dialogComponent: (message: Message) => (
+        <ReactMarkdown
+          className=""
+          components={{
+            a: (props) => (
+              <a {...props} target="_blank" rel="noopener noreferrer" />
+            ),
+          }}
+        >
+          {message.content}
+        </ReactMarkdown>
+      ),
+    },
+    assistant: {
+      avatar: <Bot width={20} />,
+      bgColor: "bg-gray-100",
+      avatarColor: "bg-green-500",
+      dialogComponent: (message: Message) => (
+        <ReactMarkdown
+          className=""
+          components={{
+            a: (props) => (
+              <a {...props} target="_blank" rel="noopener noreferrer" />
+            ),
+          }}
+        >
+          {message.content}
+        </ReactMarkdown>
+      ),
+    },
+    function: {
+      avatar: <FunctionIcon className="" />,
+      bgColor: "bg-gray-200",
+      avatarColor: "bg-blue-500",
+      dialogComponent: (message: Message) => (
+        <div className="flex flex-col">
+          <div>Result</div>
+          <Collapse text={message.content} />
+        </div>
+      ),
+    },
   };
+
 
   return (
     <main className={styles.main}>
       <h1 className={styles.title}>
         🔗 URL Surfer 🏄‍♂️
       </h1>
-
+      <div className={styles.messages}>
+      {messages.length > 0 ? (
+        messages.map((message, i) => {
+          const messageClass = `message ${message.role === 'user' ? 'message-user' : ''}`;
+          return (
+            <div key={i} className={messageClass}>
+              <div className="flex w-full max-w-screen-md items-start space-x-4 px-5 sm:px-0">
+                <div className="avatar">
+                  {roleUIConfig[message.role].avatar}
+                </div>
+                {message.content === "" && message.function_call != undefined ? (
+                  typeof message.function_call === "object" ? (
+                    <div className="flex flex-col">
+                      <div>
+                        Using{" "}
+                        <span className="font-bold">
+                          {message.function_call.name}
+                        </span>{" "}
+                        ...
+                      </div>
+                      <div className="text-sm text-gray-500 function-call">
+                        {message.function_call.arguments}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="function-call">{message.function_call}</div>
+                  )
+                ) : (
+                  roleUIConfig[message.role].dialogComponent(message)
+                )}
+              </div>
+            </div>
+          );
+      })) : null}
+      </div>
       <form onSubmit={handleSubmit} className={styles.form}>
         <input
           type="text"
-          value={prompt}
-          onChange={(e) => setPrompt(e.target.value)}
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
           placeholder="Enter URL and Prompt"
           className={styles.input}
         />
@@ -43,13 +136,8 @@ export default function Home() {
           {isLoading ? 'Loading...' : 'Submit'}
         </button>
       </form>
-
-      {response && (
-        <div className={styles.response}>
-          <h4>Response:</h4>
-          <pre>{response}</pre>
-        </div>
-      )}
     </main>
-  )
-}
+  );
+};
+
+export default URLSurferComponent;
