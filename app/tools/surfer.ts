@@ -1,4 +1,4 @@
-import { Tool } from './tool';
+import { Tool } from 'openai-function-calling-tools';
 import { z } from 'zod';
 
 function createUrlSurfer() {
