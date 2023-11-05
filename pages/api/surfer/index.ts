@@ -11,7 +11,7 @@ import { HuggingFaceTransformersEmbeddings } from "langchain/embeddings/hf_trans
 export const config = {
     api: {
       bodyParser: {
-        sizeLimit: '1mb', // Set your desired size limit here
+        sizeLimit: '1mb',
       },
     },
 };

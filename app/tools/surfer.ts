@@ -15,7 +15,7 @@ function createUrlSurfer() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ prompt: input }), // Include the prompt in the request body
+        body: JSON.stringify({ prompt: input }),
       });
 
       if (!res.ok) {

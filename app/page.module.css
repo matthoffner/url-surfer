@@ -292,7 +292,6 @@
 .main {
   display: flex;
   flex-direction: column;
-  padding: 1rem;
 }
 
 .title {
@@ -384,4 +383,33 @@
   .message {
     max-width: 100%;
   }
+}
+
+/* In your CSS file */
+.avatar-user {
+  width: 20px; /* Based on Tailwind's width setting */
+}
+
+.bg-white {
+  background-color: white;
+}
+
+.bg-black {
+  background-color: black;
+}
+
+.bg-gray-100 {
+  background-color: #f7fafc; /* Approximation of Tailwind's gray-100 */
+}
+
+.bg-green-500 {
+  background-color: #48bb78; /* Approximation of Tailwind's green-500 */
+}
+
+.bg-gray-200 {
+  background-color: #edf2f7; /* Approximation of Tailwind's gray-200 */
+}
+
+.bg-blue-500 {
+  background-color: #4299e1; /* Approximation of Tailwind's blue-500 */
 }

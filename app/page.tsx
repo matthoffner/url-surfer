@@ -1,16 +1,55 @@
 "use client";
 
 import styles from './page.module.css';
+import { useState } from 'react';
 import { useChat } from 'ai/react';
-import { Message } from 'ai';
+import { FunctionCallHandler, Message, nanoid } from 'ai';
 import ReactMarkdown from "react-markdown";
 import { Bot, User } from "lucide-react";
 import { toast } from 'sonner';
-import { Collapse } from './collapse';
 import { FunctionIcon } from './icons';
 
 const Page: React.FC = () => {
+  const functionCallHandler: FunctionCallHandler = async (
+    chatMessages,
+    functionCall,
+  ) => {
+
+    console.log(input);
+
+    let result;
+    const response = await fetch("/api/surfer", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        prompt: input
+      })
+    } as any);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      toast.error(`Something went wrong: ${errorText}`);
+      return;
+    }    
+
+    result = await response.text();
+
+    return {
+      messages: [
+        ...chatMessages,
+        {
+          id: nanoid(),
+          name: functionCall.name,
+          role: "function" as const,
+          content: result,
+        },
+      ],
+    };
+  };
   const { messages, input, setInput, handleSubmit, isLoading } = useChat({
+    experimental_onFunctionCall: functionCallHandler,
     onResponse: (response: { status: number; }) => {
       if (response.status === 429) {
         toast.error("You have reached your request limit for the day.");
@@ -23,6 +62,12 @@ const Page: React.FC = () => {
       console.log(error);
     },
   });
+  const [isExpanded, setIsExpanded] = useState(false);
+    
+  // Function to toggle the state
+  const toggleExpand = () => {
+    setIsExpanded(!isExpanded);
+  };
 
   const roleUIConfig: {
     [key: string]: {
@@ -68,16 +113,22 @@ const Page: React.FC = () => {
       ),
     },
     function: {
-      avatar: <FunctionIcon className="" />,
+      avatar: <div className="cursor-pointer" onClick={toggleExpand}><FunctionIcon /></div>,
       bgColor: "bg-gray-200",
       avatarColor: "bg-blue-500",
-      dialogComponent: (message: Message) => (
-        <div className="flex flex-col">
-          <div>Result</div>
-          <Collapse text={message.content} />
-        </div>
-      ),
-    },
+      dialogComponent: (message: Message) => {
+        const iconStyles = isExpanded ? "rotate-90" : "rotate-180";
+    
+        return (
+          <div className="flex flex-col">
+            {/* Conditionally rendering the full content based on isExpanded */}
+            {isExpanded && (
+              <div className="py-1">{message.content}</div>
+            )}
+          </div>
+        );
+      },
+    }    
   };
 
 
@@ -106,7 +157,7 @@ const Page: React.FC = () => {
                         </span>{" "}
                         ...
                       </div>
-                      <div className="text-sm text-gray-500 function-call">
+                      <div className="">
                         {message.function_call.arguments}
                       </div>
                     </div>
