@@ -31,6 +31,33 @@ const model = new HuggingFaceTransformersEmbeddings({
 
 const urlRegex = /(https?:\/\/[^\s]+)/g;
 
+const handleContentText = async (targetUrl: string) => {
+  const response = await fetch(targetUrl);
+  const contentType = response.headers.get('content-type') || '';
+  let content;
+  if (contentType.includes('application/pdf')) {
+    const buffer = await response.arrayBuffer();
+    content = await extractTextFromPDF(buffer as any);
+  } else if (contentType.includes('text/html')) {
+    const html = await response.text();
+    const dom = new JSDOM(html);
+    const scripts = dom.window.document.querySelectorAll('script, style');
+    scripts.forEach(element => element.remove());
+    content = dom.window.document.body.textContent || '';
+
+    if (!content.trim()) {
+      const browser = await puppeteer.launch();
+      const page = await browser.newPage();
+      await page.goto(targetUrl);
+      content = await page.evaluate(() => document.body.innerText);
+      await browser.close();
+    }
+  } else {
+    content = await response.text();
+  }
+  return content;
+}
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const prompt = req.body.prompt as string;
   const urls = prompt.match(urlRegex);
@@ -40,33 +67,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (!targetUrl) {
     return `Couldn't find url, here is the ${prompt}`;
   }
-
+  
   try {
-    const response = await fetch(targetUrl);
-    const contentType = response.headers.get('content-type') || '';
-    let content: string;
-
-    if (contentType.includes('application/pdf')) {
-      const buffer = await response.arrayBuffer();
-      content = await extractTextFromPDF(buffer as any);
-    } else if (contentType.includes('text/html')) {
-      const html = await response.text();
-      const dom = new JSDOM(html);
-      const scripts = dom.window.document.querySelectorAll('script, style');
-      scripts.forEach(element => element.remove());
-      content = dom.window.document.body.textContent || '';
-
-      if (!content.trim()) {
-        const browser = await puppeteer.launch();
-        const page = await browser.newPage();
-        await page.goto(targetUrl);
-        content = await page.evaluate(() => document.body.innerText);
-        await browser.close();
-      }
-    } else {
-      content = await response.text();
-    }
-
+    const content: string = await handleContentText(targetUrl)
     if (!content) {
       return `Couldn't find ${targetUrl}, here is the prompt: ${promptWithoutUrl}`;
     }

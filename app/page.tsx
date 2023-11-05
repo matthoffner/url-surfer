@@ -14,9 +14,6 @@ const Page: React.FC = () => {
     chatMessages,
     functionCall,
   ) => {
-
-    console.log(input);
-
     let result;
     const response = await fetch("/api/surfer", {
       method: "POST",
@@ -63,8 +60,6 @@ const Page: React.FC = () => {
     },
   });
   const [isExpanded, setIsExpanded] = useState(false);
-    
-  // Function to toggle the state
   const toggleExpand = () => {
     setIsExpanded(!isExpanded);
   };
@@ -117,11 +112,8 @@ const Page: React.FC = () => {
       bgColor: "bg-gray-200",
       avatarColor: "bg-blue-500",
       dialogComponent: (message: Message) => {
-        const iconStyles = isExpanded ? "rotate-90" : "rotate-180";
-    
         return (
           <div className="flex flex-col">
-            {/* Conditionally rendering the full content based on isExpanded */}
             {isExpanded && (
               <div className="py-1">{message.content}</div>
             )}
@@ -138,39 +130,39 @@ const Page: React.FC = () => {
         🔗 URL Surfer 🏄‍♂️
       </h1>
       <div className={styles.messages}>
-      {messages.length > 0 ? (
-        messages.map((message, i) => {
-          const messageClass = `message ${message.role === 'user' ? 'message-user' : ''}`;
-          return (
-            <div key={i} className={messageClass}>
-              <div className="flex w-full max-w-screen-md items-start space-x-4 px-5 sm:px-0">
-                <div className="avatar">
-                  {roleUIConfig[message.role].avatar}
-                </div>
-                {message.content === "" && message.function_call != undefined ? (
-                  typeof message.function_call === "object" ? (
-                    <div className="flex flex-col">
-                      <div>
-                        Using{" "}
-                        <span className="font-bold">
-                          {message.function_call.name}
-                        </span>{" "}
-                        ...
+        {messages.length > 0 ? (
+          messages.map((message, i) => {
+            const messageClass = `message ${message.role === 'user' ? 'message-user' : ''}`;
+            return (
+              <div key={i} className={messageClass}>
+                <div className="flex w-full max-w-screen-md items-start space-x-4 px-5 sm:px-0">
+                  <div className="avatar">
+                    {roleUIConfig[message.role].avatar}
+                  </div>
+                  {message.content === "" && message.function_call != undefined ? (
+                    typeof message.function_call === "object" ? (
+                      <div className="flex flex-col">
+                        <div>
+                          Using{" "}
+                          <span className="font-bold">
+                            {message.function_call.name}
+                          </span>{" "}
+                          ...
+                        </div>
+                        <div className="">
+                          {message.function_call.arguments}
+                        </div>
                       </div>
-                      <div className="">
-                        {message.function_call.arguments}
-                      </div>
-                    </div>
+                    ) : (
+                      <div className="function-call">{message.function_call}</div>
+                    )
                   ) : (
-                    <div className="function-call">{message.function_call}</div>
-                  )
-                ) : (
-                  roleUIConfig[message.role].dialogComponent(message)
-                )}
+                    roleUIConfig[message.role].dialogComponent(message)
+                  )}
+                </div>
               </div>
-            </div>
-          );
-      })) : null}
+            );
+        })) : null}
       </div>
       <form onSubmit={handleSubmit} className={styles.form}>
         <input
