@@ -1,8 +1,8 @@
 import { Configuration, OpenAIApi } from "openai-edge";
 import { OpenAIStream, StreamingTextResponse } from "ai";
-import { createRequest } from "@/pages/api/surfer";
+import { createUrlSurfer } from "@/app/tools/surfer";
 
-const [, requestSchema] = createRequest();
+const [, requestSchema] = createUrlSurfer();
 
 const config = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
